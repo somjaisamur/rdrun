@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
     // Get Event from Click Button
     public void clickSignUpMain(View view) {
         startActivity(new Intent(MainActivity.this,SignUpActivity.class));
+
     }
 
 }// Main Class
