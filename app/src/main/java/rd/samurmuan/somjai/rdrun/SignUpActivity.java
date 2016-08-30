@@ -14,7 +14,7 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText nameEditText,surnameEditText,userEditText, passwordEditText;
     private RadioGroup radioGroup;
     private RadioButton avata1RadioButton,avata2RadioButton,avata3RadioButton,avata4RadioButton, avata5RadioButton;
-
+    private String nameString,surnameString,userString,passwordString,avataString;//วิธีพิมพ์ surnameกดctrl+space
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
@@ -32,8 +32,32 @@ public class SignUpActivity extends AppCompatActivity {
 
     }//main method
     public void clickSignUpSign(View view) {
+        //get value from edit text
+        nameString = nameEditText.getText().toString().trim();//รับ จาก text แปลงเป็น String ตัดช่องว่าง
+        surnameString = surnameEditText.getText().toString().trim();
+        userString = userEditText.getText().toString().trim();
+        passwordString=passwordEditText.getText().toString().trim();
+        //check space ตรวจสอบหาข่องว่าง
+        if (checkSpace()) {//เอา cursor วางใน () alt+enter สร้าง method อัตโนมัริ
+            //true
+            MyAlert myAlert = new MyAlert();
+            myAlert.myDialog(this,R.drawable.doremon48,"มีช่องว่าง",
+                    "กรุณากรอกช่องว่าง คะ");
+        }
 
     }//clickSign
+
+    private boolean checkSpace() {
+        boolean result =false;
+
+        if (nameString.equals("") ||
+                surnameString.equals("")||
+                userString.equals("") ||
+                passwordString.equals("")) {//if กด shift+ctrl+enter มันจะใส่ (){} อัตโนมัติ
+            result = true;
+        }
+        return result;
+    }
 }//main class
 
 //alt+11 hind tab
