@@ -22,6 +22,8 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     private double userLatADouble=13.806576, userLngADouble = 100.579742;//Connection
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
