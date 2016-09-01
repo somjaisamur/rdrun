@@ -1,9 +1,17 @@
 package rd.samurmuan.somjai.rdrun;
 
+import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,6 +28,9 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     private TextView nameTextView, surnameTextView;
     private int[] avataInts;
     private double userLatADouble=13.806576, userLngADouble = 100.579742;//Connection
+    private LocationManager locationManager;//location ในแผนที่
+    private Criteria criteria;//เงื่อนไขในการค้นหา
+
 
 
 
@@ -34,11 +45,23 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         surnameTextView = (TextView) findViewById(R.id.textView9);
 
 
+
         //Get Value From Intent
         idString = getIntent().getStringExtra("id");
         avataString = getIntent().getStringExtra("Avata");
         nameString = getIntent().getStringExtra("Name");
         surnameString = getIntent().getStringExtra("Surname");
+
+        // setup location
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);//open location service
+        //หาระดับของ location service
+        criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);//ค้นหาโดยละเอียด 300 เมตร
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+
+
+
 
         //show text
         nameTextView.setText(nameString);
@@ -55,12 +78,96 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
     }// Main method
 
+//change mode ==> run to pouse or pouse to run
+
+//alt+ insert shoutkey
+
+    @Override
+    protected void onResume() {//when on app. start find location
+        super.onResume();
+        locationManager.removeUpdates(locationListener);
+
+        Location networkLocation = myFindLocation(LocationManager.NETWORK_PROVIDER); //ค่า location ที่ได้จากการต่อ internet
+        if (networkLocation!=null) {
+            //true
+            userLngADouble = networkLocation.getLongitude();
+            userLngADouble = networkLocation.getLongitude();
+
+        }
+        Location gpsLocation = myFindLocation(LocationManager.GPS_PROVIDER);// ค้นหา location จาก card GPS
+        if (gpsLocation != null) {
+            userLatADouble = gpsLocation.getLatitude();
+            userLngADouble = gpsLocation.getLongitude();
+        }
+    }// onResume
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        locationManager.removeUpdates(locationListener);//when close app. stop find location
+    }
+
+    //สร้าง method ใหม่ ใต้ main เสมอ
+    public Location myFindLocation(String strProvider) {//จะใช้ card หรือ isp หา location
+        Location location = null;
+        if (locationManager.isProviderEnabled(strProvider)) {
+            //true
+            locationManager.requestLocationUpdates(strProvider,1000,10,locationListener);//1นาทีค่้นหาา
+            location = locationManager.getLastKnownLocation(strProvider);
+
+        } else {
+
+            Log.d("1SepV1","Cannot find Location");
+        }
+
+        return location;
+    }
+
+    public LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {//ทำเมื่อ location เปลี่ยน
+            userLatADouble = location.getLatitude();
+            userLngADouble = location.getLongitude();
+
+
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {//ทำเมื่อเปลี่ยนสถานะ
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {//ออก Internet ได้ให้ทำอะไระ
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {//ออก Internet ไม่ได้ให้ทำอะไร
+
+        }
+    };
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
        // setup center of map
         LatLng latLng = new LatLng(userLatADouble, userLngADouble);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));// level การ Zoom map ตอนเปิด map มีทั้งหมด 20 level
-
+        //Loop
+        myLoop();//alt + enter create method
     }//onMapReady
+
+    private void myLoop() {
+        //To Do
+        Log.d("1SepV2", "Lat ==> " + userLatADouble);
+        Log.d("1SepV2", "Lng ==> " + userLngADouble);
+        //Post Delay
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                myLoop();
+            }
+        },1000);//หน่วง 1 วินาที
+    }// my loop
 }//Main Class
