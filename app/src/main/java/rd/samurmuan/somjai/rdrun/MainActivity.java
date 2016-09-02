@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private EditText userEditText, passwordEditText;//type auto user=ctrl+space
     private String userString, passwordString;
+    private CheckBox checkBox;
 
 
 
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         imageView = (ImageView) findViewById(R.id.imageView6);
         userEditText = (EditText) findViewById(R.id.editText5);
         passwordEditText = (EditText) findViewById(R.id.editText6);// type auto Alt+Enter ===cast auto // shift+ctrl+Enter === close complement
+        checkBox = (CheckBox) findViewById(R.id.checkBox);
+
 
         //load Image rom Server
         Picasso.with(this).load("http://swiftcodingthai.com/rd/Image/rd_logo.png")
@@ -117,6 +121,12 @@ public class MainActivity extends AppCompatActivity {
                             "ไม่มี " + myUserString + "ใน ฐานข้อมูลของเรา");
                 } else if (myPasswordString.equals(truePasswordString)) {
                     //Password True
+                    if (checkBox.isChecked()) {
+                        Log.d("2SepV5 ", "checkbox is checked ===> ");
+                        MyManage myManage = new MyManage(context);
+
+                    }
+
                     Intent intent = new Intent(MainActivity.this, ServiceActivity.class);
                     //วิธีการทำ intent ต้องส่งค่า id=? / Avata=? / name=? / surnam=?
                     intent.putExtra("id", idString);
@@ -157,9 +167,10 @@ public class MainActivity extends AppCompatActivity {
             myAlert.myDialog(this, R.drawable.rat48, "Have space",
                     "Please Fill All Every Blank");
         } else {
+            //No space
             SynUser synUser = new SynUser(this, userString, passwordString);
             synUser.execute();
-            //No space
+
         }
     }//clickSingnIn
 
