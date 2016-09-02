@@ -5,6 +5,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -85,6 +86,50 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }// Main method
+
+    private class SynAllUser extends AsyncTask<Void, Void, String> {// alt+ enter create auto doInBackground
+        // Explicit
+        private Context context;
+        private GoogleMap googleMap;
+        private static final String urlJSON = "http://swiftcodingthai.com/rd/get_user_master.php";
+
+
+        //Alt+ insert
+        public SynAllUser(Context context, GoogleMap googleMap) {
+            this.context = context;
+            this.googleMap = googleMap;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                OkHttpClient okHttpClient = new OkHttpClient();
+                Request.Builder builder = new Request.Builder();
+                Request request = builder.url(urlJSON).build();
+                Response response = okHttpClient.newCall(request).execute();
+                return response.body().string();
+
+            } catch (Exception e) {
+                Log.d("2SupV2 ", "e doIn ==> " + e.toString());
+                return null;
+            }
+
+        }// doInBack
+         //alt+insert create method onPostExecute
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            Log.d("2SepV2", "JSON ==> " + s);
+
+
+
+        }//onPost
+
+    }// SynallUser Class
+
+
+
 
 //change mode ==> run to pouse or pouse to run
 
@@ -169,8 +214,11 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         //To Do
         Log.d("1SepV2", "Lat ==> " + userLatADouble);
         Log.d("1SepV2", "Lng ==> " + userLngADouble);
-        // โยนค่าขึ้้น  serrverr
+        // โยนค่าขึ้้น  server
         editLatLngOnServer();//alt+enter auto method
+
+        //create marker
+        createMarker();//alt+enter
 
         //Post Delay
         Handler handler = new Handler();
@@ -182,6 +230,13 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         },1000);//หน่วง 1 วินาที
 
     }// my loop
+
+    private void createMarker() {
+        SynAllUser synAllUser = new SynAllUser(this,mMap);// ctrl+P ใน () เพื่อให้แสดงค่า parametor ที่ต้องการ
+        synAllUser.execute();
+
+
+    }//create marker
 
     private void editLatLngOnServer() {
         OkHttpClient okHttpClient = new OkHttpClient();
@@ -211,3 +266,4 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
 
     }
 }//Main Class
+//alt + 7 === show structure
