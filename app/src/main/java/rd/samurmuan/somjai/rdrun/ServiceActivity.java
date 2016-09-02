@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +22,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -46,6 +48,7 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     private LocationManager locationManager;//location ในแผนที่
     private Criteria criteria;//เงื่อนไขในการค้นหา
     private static final String urlPHP = "http://swiftcodingthai.com/rd/edit_location_somjai.php";
+    private boolean statusABoolean = true;
 
 
 
@@ -92,6 +95,22 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
     }// Main method
 
+    public void clickNormal(View view) {
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+    }
+
+    public void clickSatellite(View view) {
+        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    }
+
+    public void clickTerrain(View view) {
+        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+    }
+
+    public void clickHybrid(View view) {
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    }
+
     private class SynAllUser extends AsyncTask<Void, Void, String> {// alt+ enter create auto doInBackground
         // Explicit
         private Context context;
@@ -101,8 +120,10 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         private int[] avataInts;
         private double[] latDoubles, lngDoubles;
 
+
         //Alt+ insert
         public SynAllUser(Context context, GoogleMap googleMap) {
+
             this.context = context;
             this.googleMap = googleMap;
         }
@@ -124,7 +145,7 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         }// doInBack
          //alt+insert create method onPostExecute
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(final String s) {
             super.onPostExecute(s);
 
             Log.d("2SepV2", "JSON ==> " + s);
@@ -161,6 +182,14 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
                     .title(nameStrings[i]+" "+surnameStrings[i]));
 
                 }// end for
+
+                googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                    @Override
+                    public void onMapLongClick(LatLng latLng) {
+                        statusABoolean = !statusABoolean;
+                        Log.d("2SepV4", "Status ==> " + statusABoolean);
+                    }
+                });
             } catch (Exception e) {
                 Log.d("2SepV3", "e onPost ==> " + e.toString());
 
@@ -261,7 +290,10 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         editLatLngOnServer();//alt+enter auto method
 
         //create marker
-        createMarker();//alt+enter
+
+        if (statusABoolean) {
+            createMarker();//alt+enter
+        }
 
         //Post Delay
         Handler handler = new Handler();
