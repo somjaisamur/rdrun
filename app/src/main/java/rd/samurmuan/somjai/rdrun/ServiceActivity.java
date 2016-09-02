@@ -19,6 +19,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.okhttp.Call;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.FormEncodingBuilder;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
+import java.io.IOException;
 
 public class ServiceActivity extends FragmentActivity implements OnMapReadyCallback {
     //Explicit
@@ -27,11 +36,10 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     private ImageView imageView;
     private TextView nameTextView, surnameTextView;
     private int[] avataInts;
-    private double userLatADouble=13.806576, userLngADouble = 100.579742;//Connection
+    private double userLatADouble=13.674900, userLngADouble = 100.721001;//Connection ,  //13.806576,100.579742
     private LocationManager locationManager;//location ในแผนที่
     private Criteria criteria;//เงื่อนไขในการค้นหา
-
-
+    private static final String urlPHP = "http://swiftcodingthai.com/rd/edit_location_somjai.php";
 
 
 
@@ -161,6 +169,9 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         //To Do
         Log.d("1SepV2", "Lat ==> " + userLatADouble);
         Log.d("1SepV2", "Lng ==> " + userLngADouble);
+        // โยนค่าขึ้้น  serrverr
+        editLatLngOnServer();//alt+enter auto method
+
         //Post Delay
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -169,5 +180,34 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
                 myLoop();
             }
         },1000);//หน่วง 1 วินาที
+
     }// my loop
+
+    private void editLatLngOnServer() {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        //request body
+        RequestBody requestBody = new FormEncodingBuilder()
+                .add("isAdd", "true")
+                .add("id", idString)
+                .add("Lat", Double.toString(userLatADouble))
+                .add("Lng", Double.toString(userLngADouble))
+                .build();
+        //จ่าหน้าซอง
+        Request.Builder builder = new Request.Builder();
+        Request request = builder.url(urlPHP).post(requestBody).build();
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Log.d("2SepV1"," ====>" + e.toString());
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                Log.d("2SepV1", "Result ===> " + response.body().toString());
+
+            }
+        });
+
+    }
 }//Main Class
